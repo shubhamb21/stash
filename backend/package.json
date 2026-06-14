@@ -15,14 +15,14 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^6.0.0",
     "axios": "^1.17.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "prisma": "^7.8.0",
+    "prisma": "^6.0.0",
     "psn-api": "^2.18.0"
   },
   "devDependencies": {
