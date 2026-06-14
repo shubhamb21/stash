@@ -1,0 +1,81 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  platforms PlatformConnection[]
+  games     UserGame[]
+}
+
+model PlatformConnection {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  platform  String   // "steam" | "playstation"
+
+  // Steam fields
+  steamId      String?
+  steamApiKey  String?
+
+  // PlayStation fields
+  psnAccountId   String?
+  psnAccessToken String?
+  psnRefreshToken String?
+  psnTokenExpiresAt DateTime?
+
+  lastSyncedAt DateTime?
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, platform])
+}
+
+model Game {
+  id          String  @id @default(cuid())
+  platform    String  // "steam" | "playstation"
+  platformId  String  // Steam appid or PSN titleId
+  name        String
+  coverUrl    String?
+  genre       String?
+  releaseYear Int?
+
+  userGames UserGame[]
+
+  @@unique([platform, platformId])
+}
+
+model UserGame {
+  id     String @id @default(cuid())
+  userId String
+  gameId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id])
+
+  // User-controlled fields
+  status    String   @default("backlog") // playing | finished | abandoned | backlog | wishlist | hold
+  rating    Float?   // 0.0 to 10.0
+  notes     String?
+  isManual  Boolean  @default(false)
+
+  // Synced from platform
+  playtimeMinutes Int?
+  lastPlayedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, gameId])
+}
